@@ -110,8 +110,12 @@ class FishViewModel(
         description: String,
         river: String
     ): Boolean {
-        Log.d("FishViewModel", "validateFish: $name $weight $height $length $image $description $river")
-        val ans= name.isNotBlank() && weight.isNotBlank() && height.isNotBlank() && length.isNotBlank() && image.isNotEmpty() && description.isNotBlank() && river.isNotBlank()
+        Log.d(
+            "FishViewModel",
+            "validateFish: $name $weight $height $length $image $description $river"
+        )
+        val ans =
+            name.isNotBlank() && weight.isNotBlank() && height.isNotBlank() && length.isNotBlank() && image.isNotEmpty() && description.isNotBlank() && river.isNotBlank()
         Log.d("FishViewModel", "validateFish: $ans")
         return ans
     }
@@ -134,6 +138,16 @@ class FishViewModel(
         }
     }
 
+    private fun setFishById(fishId: Int) {
+        viewModelScope.launch {
+            dao.getFishById(fishId).collect { fish ->
+                _state.update {
+                    it.copy(fish = fish)
+                }
+            }
+        }
+    }
+
     fun onEvent(event: FishScreenEvent) {
         when (event) {
             FishScreenEvent.SaveFish -> saveFish()
@@ -146,8 +160,13 @@ class FishViewModel(
             is FishScreenEvent.SetFishName -> _state.update { it.copy(fishName = event.fishName) }
             is FishScreenEvent.SetFishRiver -> _state.update { it.copy(fishRiver = event.fishRiver) }
             is FishScreenEvent.SetFishWeight -> _state.update { it.copy(fishWeight = event.fishWeight) }
-            is FishScreenEvent.SetMessage -> _state.update { it.copy(message=event.message) }
+            is FishScreenEvent.SetMessage -> _state.update { it.copy(message = event.message) }
             is FishScreenEvent.SetSortBy -> _sortType.update { event.sortBy }
+            is FishScreenEvent.SetFishById -> setFishById(event.fishId)
+            is FishScreenEvent.SetFishFields -> TODO()
         }
     }
 }
+
+
+
